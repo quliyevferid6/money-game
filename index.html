@@ -1,39 +1,198 @@
 <!DOCTYPE html>
 <html lang="az">
 <head>
-  <meta charset="UTF-8">
-  <title>Money Game</title>
-  <style>
-    body {
-      font-family: Arial;
-      text-align: center;
-      background: #111;
-      color: white;
-      margin-top: 100px;
-    }
-    button {
-      padding: 20px 40px;
-      font-size: 24px;
-      background: gold;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>🔥 3D Click Master Game</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:radial-gradient(circle,#0f2027,#000);
+    font-family:Arial;
+    color:white;
+    overflow:hidden;
+    transition:0.6s;
+}
+
+.game{
+    text-align:center;
+    perspective:1000px;
+}
+
+#coin{
+    font-size:160px;
+    cursor:pointer;
+    transition:0.2s;
+    transform-style:preserve-3d;
+    filter:drop-shadow(0 0 20px #00f2ff);
+}
+
+#coin:active{
+    transform:rotateX(30deg) scale(0.9);
+}
+
+.stats{
+    font-size:22px;
+    margin:15px;
+    text-shadow:0 0 10px black;
+}
+
+button{
+    padding:12px 18px;
+    margin:6px;
+    border:none;
+    border-radius:14px;
+    font-size:16px;
+    cursor:pointer;
+    background:#111;
+    color:white;
+    box-shadow:0 0 15px rgba(0,255,255,0.2);
+}
+
+.popup{
+    position:absolute;
+    font-size:28px;
+    animation:floatUp 1s forwards;
+    pointer-events:none;
+}
+
+@keyframes floatUp{
+    from{opacity:1; transform:translateY(0) scale(1);}
+    to{opacity:0; transform:translateY(-120px) scale(1.5);}
+}
+
+.glow{
+    position:absolute;
+    width:300px;
+    height:300px;
+    background:radial-gradient(circle,rgba(0,255,255,0.4),transparent);
+    filter:blur(80px);
+    animation:spin 20s linear infinite;
+}
+
+@keyframes spin{
+    from{transform:rotate(0deg);}
+    to{transform:rotate(360deg);}
+}
+</style>
 </head>
+
 <body>
 
-<h1>💰 Pul Qazan Oyunu</h1>
-<p>Balans: <span id="money">0</span> ₼</p>
+<div class="glow"></div>
 
-<button onclick="addMoney()">Kliklə!</button>
+<div class="game">
+    <div id="coin">🪙</div>
+
+    <div class="stats">
+        Pul: <span id="money">0</span> 💰<br>
+        Level: <span id="level">1</span> ⭐<br>
+        Auto: <span id="auto">0</span> 🤖
+    </div>
+
+    <button onclick="buyClick()">⬆ Click Power (Cost <span id="clickCost">100</span>)</button>
+    <button onclick="buyAuto()">🤖 Auto Income (Cost <span id="autoCost">150</span>)</button>
+</div>
+
+<audio id="clickSound">
+<source src="https://actions.google.com/sounds/v1/cartoon/pop.ogg">
+</audio>
 
 <script>
-let money = 0;
-function addMoney() {
-  money++;
-  document.getElementById("money").innerText = money;
+let money=0;
+let level=1;
+
+let clickPower=1;
+let autoIncome=0;
+
+let clickCost=100;
+let autoCost=150;
+
+const coin=document.getElementById("coin");
+const clickSound=document.getElementById("clickSound");
+
+/* Click */
+coin.onclick=()=>{
+    money+=clickPower;
+    playSound();
+    showPopup("+"+clickPower);
+    checkLevel();
+    updateUI();
+
+    coin.style.transform="rotateY(20deg) scale(1.1)";
+    setTimeout(()=>coin.style.transform="",150);
+};
+
+/* Upgrades */
+function buyClick(){
+    if(money>=clickCost){
+        money-=clickCost;
+        clickPower++;
+        clickCost=Math.floor(clickCost*1.7);
+    }
+    updateUI();
 }
+
+function buyAuto(){
+    if(money>=autoCost){
+        money-=autoCost;
+        autoIncome++;
+        autoCost=Math.floor(autoCost*1.6);
+    }
+    updateUI();
+}
+
+/* Auto income */
+setInterval(()=>{
+    money+=autoIncome;
+    checkLevel();
+    updateUI();
+},1000);
+
+/* Level system */
+function checkLevel(){
+    level=Math.floor(money/700)+1;
+
+    let hue=level*20;
+    document.body.style.background=
+        `radial-gradient(circle,hsl(${hue},80%,10%),black)`;
+}
+
+/* Popup */
+function showPopup(text){
+    let pop=document.createElement("div");
+    pop.className="popup";
+    pop.innerText=text+" 💰";
+
+    let rect=coin.getBoundingClientRect();
+    pop.style.left=(rect.left+70)+"px";
+    pop.style.top=rect.top+"px";
+
+    document.body.appendChild(pop);
+    setTimeout(()=>pop.remove(),1000);
+}
+
+/* Sound */
+function playSound(){
+    clickSound.currentTime=0;
+    clickSound.play();
+}
+
+/* UI */
+function updateUI(){
+    document.getElementById("money").innerText=Math.floor(money);
+    document.getElementById("level").innerText=level;
+    document.getElementById("auto").innerText=autoIncome;
+
+    document.getElementById("clickCost").innerText=clickCost;
+    document.getElementById("autoCost").innerText=autoCost;
+}
+
+updateUI();
 </script>
 
 </body>
