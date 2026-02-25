@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <title>Money Game</title>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      background: #111;
+      color: white;
+      margin-top: 100px;
+    }
+    button {
+      padding: 20px 40px;
+      font-size: 24px;
+      background: gold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>💰 Pul Qazan Oyunu</h1>
+<p>Balans: <span id="money">0</span> ₼</p>
+
+<button onclick="addMoney()">Kliklə!</button>
+
+<script>
+let money = 0;
+function addMoney() {
+  money++;
+  document.getElementById("money").innerText = money;
+}
+</script>
+
+</body>
+</html>
